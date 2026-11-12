@@ -3,76 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>正在打开页面</title>
+<title>二维码已作废</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:#f5f6f8;color:#1f2430;
+  background:#f5f6f8;color:#1f2430;padding:24px;
   font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-  padding:24px;
 }
 .card{
   width:100%;max-width:340px;background:#fff;border-radius:10px;
-  padding:36px 26px;text-align:center;
+  padding:40px 26px;text-align:center;
   box-shadow:0 6px 24px rgba(20,26,40,.06);
 }
-.spinner{
-  width:34px;height:34px;margin:0 auto 22px;border-radius:50%;
-  border:2px solid #e6e8ec;border-top-color:#2f6bff;
-  animation:spin .9s linear infinite;
+.icon{
+  width:44px;height:44px;margin:0 auto 20px;border-radius:50%;
+  background:#fbeceb;display:flex;align-items:center;justify-content:center;
 }
-@keyframes spin{to{transform:rotate(360deg);}}
+.icon svg{width:22px;height:22px;fill:#c2453c;}
 h1{font-size:17px;font-weight:600;line-height:1.5;}
-p{margin-top:8px;font-size:13px;color:#8a909c;line-height:1.7;}
-a{display:inline-block;margin-top:20px;font-size:13px;color:#2f6bff;text-decoration:none;border-bottom:1px solid rgba(47,107,255,.35);}
-a:hover{color:#1c4fd0;}
-.used{color:#c2453c;}
+p{margin-top:10px;font-size:13px;color:#8a909c;line-height:1.8;}
 </style>
 </head>
 <body>
 <div class="card">
-  <div class="spinner" id="spin"></div>
-  <h1 id="title">正在为你打开页面…</h1>
-  <p id="desc">二维码仅可扫码打开一次，请稍候</p>
-  <a id="manual" href="https://hwdbgly.github.io/ad-assets/" style="display:none;">没有自动跳转？点这里打开</a>
+  <div class="icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm5 13.6L15.6 17 12 13.4 8.4 17 7 15.6 10.6 12 7 8.4 8.4 7 12 10.6 15.6 7 17 8.4 13.4 12 17 15.6z"/></svg>
+  </div>
+  <h1>该二维码已作废</h1>
+  <p>此链接已停用，无法再打开页面<br>如需继续访问，请向发送方索取新的二维码</p>
 </div>
-
-<script>
-(function () {
-  var KEY = 'qr-once-zzf-01';
-  var TARGET = 'https://hwdbgly.github.io/ad-assets/';
-
-  var title = document.getElementById('title');
-  var desc = document.getElementById('desc');
-  var spin = document.getElementById('spin');
-  var manual = document.getElementById('manual');
-
-  // 方便你自己重置：地址后加 ?reset=1
-  if (location.search.indexOf('reset=1') > -1) {
-    try { localStorage.removeItem(KEY); } catch (e) {}
-    if (spin) spin.remove();
-    title.textContent = '已重置';
-    desc.textContent = '本机记录已清除，关闭本页后可重新扫码测试';
-    return;
-  }
-
-  var used = false;
-  try { used = localStorage.getItem(KEY) === '1'; } catch (e) { used = false; }
-
-  if (used) {
-    if (spin) spin.remove();
-    title.textContent = '该二维码已使用';
-    title.className = 'used';
-    desc.textContent = '同一个二维码只能扫码打开一次';
-    return;
-  }
-
-  try { localStorage.setItem(KEY, '1'); } catch (e) {}
-
-  manual.style.display = 'inline-block';
-  setTimeout(function () { location.replace(TARGET); }, 900);
-})();
-</script>
 </body>
 </html>
