@@ -181,8 +181,8 @@
         <div class="video-feed" id="videoFeed">
             <!-- 第1个普通视频 -->
             <div class="video-item">
-                <video src="assets/ad-01.mp4"
-       controls playsinline preload="metadata"
+                <video src="assets/ad-01.mp4" autoplay muted loop
+       controls playsinline preload="auto"
        style="width:100%;aspect-ratio:9/16;object-fit:cover;background:#000"></video>
                 <div class="tip-box">
                     <h2>预览短视频信息流</h2>
@@ -192,7 +192,7 @@
 
             <!-- 第2个广告视频，初始隐藏 -->
             <div class="video-item ad-video" id="adVideoItem">
-                <video id="adVideoPlayer" src="assets/ad-01.mp4" controls playsinline preload="metadata">
+                <video id="adVideoPlayer" src="assets/ad-01.mp4" autoplay muted loop controls playsinline preload="auto">
                     您的浏览器不支持视频播放。
                 </video>
                 <span class="ad-tag">广告</span>
@@ -218,7 +218,7 @@
 
             <!-- 第3个普通视频 -->
             <div class="video-item">
-                <video muted loop playsinline>
+                <video autoplay muted loop playsinline preload="auto">
                     <source src="assets/ad-01.mp4" type="video/mp4">
                     您的浏览器不支持视频播放。
                 </video>
@@ -242,11 +242,36 @@
     <script>
         const videoFeed = document.getElementById('videoFeed');
 
-        // 普通视频自动播放
-        document.querySelectorAll('.video-item video').forEach(video => {
+        // 视频自动播放：进入视野的那一屏播放，离开的暂停
+        function tryPlay(video) {
+            const p = video.play();
+            if (p && p.catch) { p.catch(() => {}); }
+        }
+
+        if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    const video = entry.target.querySelector('video');
+                    if (!video) return;
+                    if (entry.intersectionRatio > 0.6) {
+                        tryPlay(video);
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, { threshold: [0.6] });
+            document.querySelectorAll('.video-item').forEach((item) => io.observe(item));
+        }
+
+        // 首屏立即尝试播放（浏览器限制自动播放时静默失败，用户点击即可播放）
+        const firstVideo = document.querySelector('.video-item video');
+        if (firstVideo) { tryPlay(firstVideo); }
+
+        // 点击视频可暂停 / 继续
+        document.querySelectorAll('.video-item video').forEach((video) => {
             video.addEventListener('click', () => {
                 if (video.paused) {
-                    video.play();
+                    tryPlay(video);
                 } else {
                     video.pause();
                 }
