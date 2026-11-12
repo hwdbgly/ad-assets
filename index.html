@@ -143,30 +143,6 @@
             color: #fff;
         }
 
-        .start-btn {
-            position: absolute;
-            left: 18px;
-            bottom: 80px;
-            z-index: 20;
-            background: linear-gradient(135deg, #ff5c00, #ff0034);
-            color: #fff;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 92, 0, 0.45);
-        }
-
-        .start-btn:active {
-            transform: scale(0.95);
-        }
-
-        .file-input {
-            display: none;
-        }
-
         .tip-box {
             position: absolute;
             top: 50%;
@@ -215,8 +191,8 @@
             </div>
 
             <!-- 第2个广告视频，初始隐藏 -->
-            <div class="video-item ad-video hidden" id="adVideoItem">
-                <video id="adVideoPlayer" controls playsinline>
+            <div class="video-item ad-video" id="adVideoItem">
+                <video id="adVideoPlayer" src="assets/ad-01.mp4" controls playsinline preload="metadata">
                     您的浏览器不支持视频播放。
                 </video>
                 <span class="ad-tag">广告</span>
@@ -261,37 +237,10 @@
             <div class="nav-item">我的</div>
         </div>
 
-        <button class="start-btn" id="startBtn">预览启动</button>
-        <input type="file" accept="video/*" class="file-input" id="fileInput">
     </div>
 
     <script>
-        const startBtn = document.getElementById('startBtn');
-        const fileInput = document.getElementById('fileInput');
-        const adVideoItem = document.getElementById('adVideoItem');
-        const adVideoPlayer = document.getElementById('adVideoPlayer');
         const videoFeed = document.getElementById('videoFeed');
-
-        // 左下角按钮点击后选择本地视频
-        startBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        // 用户选择本地视频后，加载到广告位
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const url = URL.createObjectURL(file);
-            adVideoPlayer.src = url;
-            adVideoItem.classList.remove('hidden');
-
-            // 自动滚动到广告视频位置
-            adVideoItem.scrollIntoView({ behavior: 'smooth' });
-
-            // 播放广告视频
-            adVideoPlayer.play();
-        });
 
         // 普通视频自动播放
         document.querySelectorAll('.video-item video').forEach(video => {
