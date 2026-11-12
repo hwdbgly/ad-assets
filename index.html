@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            position: relative;
+            background: #111;
+        }
+
+        .video-feed {
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+
+        .video-feed::-webkit-scrollbar {
+            display: none;
+        }
+
+        .video-item {
+            width: 100%;
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .video-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .ad-video {
+            position: relative;
+        }
+
+        .ad-tag {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 80, 0, 0.95);
+            color: #fff;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .ad-info {
+            position: absolute;
+            bottom: 80px;
+            left: 12px;
+            right: 60px;
+            z-index: 10;
+        }
+
+        .ad-info h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .ad-info p {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .side-actions {
+            position: absolute;
+            right: 12px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            z-index: 10;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            color: #fff;
+            gap: 4px;
+        }
+
+        .action-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: #000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 15;
+            border-top: 1px solid #222;
+        }
+
+        .nav-item {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+        }
+
+        .nav-item.active {
+            color: #fff;
+        }
+
+        .start-btn {
+            position: absolute;
+            left: 18px;
+            bottom: 80px;
+            z-index: 20;
+            background: linear-gradient(135deg, #ff5c00, #ff0034);
+            color: #fff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 92, 0, 0.45);
+        }
+
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .tip-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            padding: 18px 22px;
+            background: rgba(0, 0, 0, 0.5);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            z-index: 12;
+            max-width: 78%;
+        }
+
+        .tip-box h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .tip-box p {
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="video-feed" id="videoFeed">
+            <!-- 第1个普通视频 -->
+            <div class="video-item">
+                <video src="assets/ad-01.mp4"
+       controls playsinline preload="metadata"
+       style="width:100%;aspect-ratio:9/16;object-fit:cover;background:#000"></video>
+                <div class="tip-box">
+                    <h2>预览短视频信息流</h2>
+                    <p>向下滑动继续浏览<br>广告视频会出现在下一屏</p>
+                </div>
+            </div>
+
+            <!-- 第2个广告视频，初始隐藏 -->
+            <div class="video-item ad-video hidden" id="adVideoItem">
+                <video id="adVideoPlayer" controls playsinline>
+                    您的浏览器不支持视频播放。
+                </video>
+                <span class="ad-tag">广告</span>
+                <div class="ad-info">
+                    <h3>投放广告视频</h3>
+                    <p>广告预览</p>
+                </div>
+                <div class="side-actions">
+                    <div class="action-btn">
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        <span>点赞</span>
+                    </div>
+                    <div class="action-btn">
+                        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+                        <span>评论</span>
+                    </div>
+                    <div class="action-btn">
+                        <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+                        <span>分享</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第3个普通视频 -->
+            <div class="video-item">
+                <video muted loop playsinline>
+                    <source src="assets/ad-01.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放。
+                </video>
+                <div class="tip-box">
+                    <h2>预览广告投放效果</h2>
+                    <p>广告已展示完成<br>可继续上下滑动体验</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">首页</div>
+            <div class="nav-item">发现</div>
+            <div class="nav-item active">视频</div>
+            <div class="nav-item">消息</div>
+            <div class="nav-item">我的</div>
+        </div>
+
+        <button class="start-btn" id="startBtn">预览启动</button>
+        <input type="file" accept="video/*" class="file-input" id="fileInput">
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const fileInput = document.getElementById('fileInput');
+        const adVideoItem = document.getElementById('adVideoItem');
+        const adVideoPlayer = document.getElementById('adVideoPlayer');
+        const videoFeed = document.getElementById('videoFeed');
+
+        // 左下角按钮点击后选择本地视频
+        startBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 用户选择本地视频后，加载到广告位
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const url = URL.createObjectURL(file);
+            adVideoPlayer.src = url;
+            adVideoItem.classList.remove('hidden');
+
+            // 自动滚动到广告视频位置
+            adVideoItem.scrollIntoView({ behavior: 'smooth' });
+
+            // 播放广告视频
+            adVideoPlayer.play();
+        });
+
+        // 普通视频自动播放
+        document.querySelectorAll('.video-item video').forEach(video => {
+            video.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
